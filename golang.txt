@@ -1,0 +1,4 @@
+A statically typed, garbage collected, compiled programming language from Google.
+
+
+Harmless.
