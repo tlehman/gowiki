@@ -1,21 +1,23 @@
 package main
 
 import (
+    "html/template"
 	"io/ioutil"
+    "net/http"
 )
+
+const lenPath = len("/view/")
 
 type Page struct {
     Title string
     Body []byte
 }
 
-// to persist the Page
 func (p *Page) save() error {
     filename := p.Title + ".txt"
     return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
-// to fetch the page from disk
 func loadPage(title string) (*Page, error) {
     filename := title + ".txt"
     body, err := ioutil.ReadFile(filename)
@@ -25,4 +27,29 @@ func loadPage(title string) (*Page, error) {
     return &Page{Title: title, Body: body}, nil
 }
 
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+    title := r.URL.Path[lenPath:]
+    p, _ := loadPage(title)
+    t, _ := template.ParseFiles("view.html")
+    t.Execute(w, p)
+}
 
+func editHandler(w http.ResponseWriter, r *http.Request) {
+    title := r.URL.Path[lenPath:]
+    p, err := loadPage(title)
+    if err != nil {
+        p = &Page{Title: title}
+    }
+    t, _ := template.ParseFiles("edit.html")
+    t.Execute(w, p)
+}
+
+func saveHandler(w http.ResponseWriter, r *http.Request) {
+}
+
+func main() {
+    http.HandleFunc("/view", viewHandler)
+    http.HandleFunc("/edit", editHandler)
+    http.HandleFunc("/save", saveHandler)
+    http.ListenAndServe(":8080", nil)
+}
