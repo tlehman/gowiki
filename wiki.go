@@ -8,7 +8,7 @@ import (
 )
 
 const lenPath = len("/view/")
-var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+var templates = template.Must(template.ParseFiles("tmpl/edit.html", "tmpl/view.html"))
 var titleValidator = regexp.MustCompile("^[a-zA-Z0-9]+$")
 
 type Page struct {
@@ -17,12 +17,12 @@ type Page struct {
 }
 
 func (p *Page) save() error {
-	filename := p.Title + ".txt"
+	filename := "data/" + p.Title + ".txt"
 	return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
 func loadPage(title string) (*Page, error) {
-	filename := title + ".txt"
+	filename := "data/" + title + ".txt"
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,6 @@ func loadPage(title string) (*Page, error) {
 func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
 	if err != nil {
-		// create content if $title.txt doesn't exist
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
 	}
