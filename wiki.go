@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
     "html/template"
 	"io/ioutil"
     "net/http"
@@ -29,9 +30,13 @@ func loadPage(title string) (*Page, error) {
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
     title := r.URL.Path[lenPath:]
-    p, _ := loadPage(title)
-    t, _ := template.ParseFiles("view.html")
-    t.Execute(w, p)
+    p, err := loadPage(title)
+    if err != nil {
+        // create content if $title.txt doesn't exist
+        http.Redirect(w, r, "/edit/"+title, http.StatusFound)
+        return
+    }
+    renderTemplate(w, "view", p)
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,16 +45,25 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         p = &Page{Title: title}
     }
-    t, _ := template.ParseFiles("edit.html")
+    renderTemplate(w, "edit", p)
+}
+
+func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+    t, err := template.ParseFiles(tmpl + ".html")
+    if err != nil {
+        fmt.Printf("%v\n", err)
+    }
     t.Execute(w, p)
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
+    title := r.URL.Path[lenPath:]
+    body := r.FormValue("body")n
 }
 
 func main() {
-    http.HandleFunc("/view", viewHandler)
-    http.HandleFunc("/edit", editHandler)
+    http.HandleFunc("/view/", viewHandler)
+    http.HandleFunc("/edit/", editHandler)
     http.HandleFunc("/save", saveHandler)
     http.ListenAndServe(":8080", nil)
 }
