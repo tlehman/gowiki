@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 )
 
@@ -27,11 +26,3 @@ func loadPage(title string) (*Page, error) {
 }
 
 
-func main() {
-    page, err := loadPage("pandas")
-    if err != nil {
-        fmt.Printf("%v\n", err)
-    } else {
-        fmt.Printf("<h1>%s</h1>\n<br><p>%s</p>\n", page.Title, page.Body)
-    }
-}
