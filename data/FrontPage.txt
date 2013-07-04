@@ -1,0 +1,1 @@
+Welcome to gowiki! This is an exercise in using [GoLang] to write a web application. It is a simple wiki, built only using go and it's standard library.
