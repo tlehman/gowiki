@@ -74,8 +74,19 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	}
 }
 
+func (p *Page) linkify() (*Page) {
+	linkPattern := regexp.MustCompile(`\[[a-zA-Z0-9]+\]`)
+	return &Page{
+		Title: p.Title,
+		Body: linkPattern.ReplaceAllFunc(p.Body, func(b []byte) ([]byte) {
+			return []byte("<a href=\"/view/" + string(b) + "\">" + string(b) + "</a>")
+		}),
+	}
+}
+
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	err := templates.ExecuteTemplate(w, tmpl + ".html", p)
+	// TODO: Figure out how to get ExecuteTemplate to stop escaping the html links
+	err := templates.ExecuteTemplate(w, tmpl + ".html", p.linkify())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
