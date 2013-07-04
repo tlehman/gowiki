@@ -32,6 +32,6 @@ func main() {
     if err != nil {
         fmt.Printf("%v\n", err)
     } else {
-        fmt.Printf("<h1>%s</h1><br><p>%s</p>\n", page.Title, page.Body)    
+        fmt.Printf("<h1>%s</h1>\n<br><p>%s</p>\n", page.Title, page.Body)
     }
 }
